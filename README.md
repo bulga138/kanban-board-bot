@@ -1,12 +1,12 @@
-# Kanbot
+# Foolish Assistant for Ridiculous Tasks
 
 :clipboard: A lightweight Kanban board bot, for your Discord! <br /><br />
 
-![logo](https://media.discordapp.net/attachments/449647907772170253/449770623187812362/kanbotcircle.png)
+![logo](fartbot.png)
 
 ## Getting started 
 
-This is a bot for your Discord, so if you dont already have a Discord
+This is a bot for your Discord, so if you don't already have a Discord
 register and download [here](https://discordapp.com/) <br />
 
 If you are not familiar with a kanban board [here](https://leankit.com/learn/kanban/kanban-board/) is a great description by *leankit*
@@ -16,13 +16,13 @@ If you are not familiar with a kanban board [here](https://leankit.com/learn/kan
 clone this repository
 
 ```
-$ git clone git@git:seansylee/kanban-board-bot.git
+$ git clone git@git:bulga138/kanban-board-bot.git
 ```
 
 install the necessary node modules
 
 ```
-$ npm install
+$ pnpm install
 ```
 
 create a bot through the discord developer portal and add your token in a file labeled `botconfig.json`
@@ -30,16 +30,16 @@ create a bot through the discord developer portal and add your token in a file l
 start the server!
 
 ```
-$ npm run watch
+$ pnpm run watch
 ```
 
 ## Documentation
 
-Type the commands following `$kanbot` into your Discord chat box to launch the app.
+Type the commands following `$fart` into your Discord chat box to launch the app.
 
 |Command| Usage|
 | ------------- |:-------------:|
-| `$kanbot`| displays current kanban board|
+| `$fart`| displays current kanban board|
 |||
 | `-help` | displays possible commands |
 | `-add <"item">` | adds "item" into 'backlog'|
@@ -50,10 +50,10 @@ Type the commands following `$kanbot` into your Discord chat box to launch the a
 
 ## Examples
 
-`$kanbot` to display the board <br /><br />
+`$fart` to display the board <br /><br />
 ![board](https://i.imgur.com/KkAgFms.png)<br /><br />
 
-`$kanbot -add "Enjoy cookies"` to add to the backlog <br /><br />
+`$fart -add "Enjoy cookies"` to add to the backlog <br /><br />
 ![add-to-board](https://i.imgur.com/D7VfZDI.png)<br />
 
 Made with :heart:

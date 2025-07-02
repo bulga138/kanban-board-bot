@@ -1,12 +1,24 @@
-import botconfig from './config/botconfig.json';
-import Discord, { ClientOptions } from 'discord.js';
-import { KanbanBot } from './clients/discord-bot-wrapper';
-import { KanbotConfiguration } from './application/kanbot-configuration';
-import { KanbanBoard } from './application/kanban-board';
-import { Task } from './application/models/task';
+import botconfig from "./config/botconfig.json";
+import Discord, { ClientOptions } from "discord.js";
+import { KanbanBot } from "./clients/discord-bot-wrapper";
+import { KanbotConfiguration } from "./application/kanbot-configuration";
+import { KanbanBoard } from "./application/kanban-board";
+import { Task } from "./application/models/task";
+import { KanbotClient } from "./clients/kanbot-client";
 
-const configuration: KanbotConfiguration = new KanbotConfiguration(botconfig.botName, botconfig.token, botconfig.prefix, 'kanbot');
-const clientOptions: ClientOptions = { disableEveryone: true };
+const configuration: KanbotConfiguration = new KanbotConfiguration(
+  botconfig.botName,
+  botconfig.token,
+  botconfig.prefix,
+  "kanbot"
+);
+const clientOptions: ClientOptions = {
+  intents: [
+    Discord.GatewayIntentBits.Guilds,
+    Discord.GatewayIntentBits.GuildMessages,
+    Discord.GatewayIntentBits.DirectMessages,
+  ],
+};
 const discordClient: Discord.Client = new Discord.Client(clientOptions);
 const bot: KanbanBot = new KanbanBot(configuration, discordClient);
 bot.setupBot();

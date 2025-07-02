@@ -48,7 +48,7 @@ export class KanbotClient {
         const caller: string = message.author.username;
 
         if (message.author.bot) return;
-        if (channel.type === 'dm') return;
+        if (channel.type === Discord.ChannelType.DM) return;
 
         // Parse command, and check.
         const inputs: string[] = message.content.split(' -');
@@ -68,7 +68,13 @@ export class KanbotClient {
                 this.addToBacklog(message, request.taskName);
                 break;
             case KanbotCommands.HELP:
-                message.channel.send(this.helpList(message));
+                if (
+                    message.channel &&
+                    (message.channel.type === Discord.ChannelType.GuildText ||
+                     message.channel.type === Discord.ChannelType.AnnouncementThread)
+                ) {
+                    message.channel.send({ embeds: [this.helpList(message)] });
+                }
                 break;
             case KanbotCommands.REMOVE:
                 this.removeItem(message, request.taskName);
@@ -81,33 +87,63 @@ export class KanbotClient {
                 break;
             case KanbotCommands.CLEAR:
                 this.board.clearBoard();
-                channel.send({
-                    embed: {
-                        color: 3447003,
-                        description: `Board cleared by: ${message.author.username}`
-                    }
-                });
+                if (
+                    channel.type === Discord.ChannelType.GuildText ||
+                    channel.type === Discord.ChannelType.GuildAnnouncement ||
+                    channel.type === Discord.ChannelType.PublicThread ||
+                    channel.type === Discord.ChannelType.PrivateThread
+                ) {
+                    (channel as Discord.TextChannel | Discord.NewsChannel | Discord.ThreadChannel).send({
+                        embeds: [
+                            new Discord.EmbedBuilder()
+                                .setColor(3447003)
+                                .setDescription(`Board cleared by: ${message.author.username}`)
+                        ]
+                    });
+                }
                 break;
             default:
-                channel.send({
-                    embed: {
-                        color: 3447003,
-                        description: `Invalid request: ${request.command} ${request.taskName}`
-                    }
-                });
+                if (
+                    channel.type === Discord.ChannelType.GuildText ||
+                    channel.type === Discord.ChannelType.GuildAnnouncement ||
+                    channel.type === Discord.ChannelType.PublicThread ||
+                    channel.type === Discord.ChannelType.PrivateThread
+                ) {
+                    (channel as Discord.TextChannel | Discord.NewsChannel | Discord.ThreadChannel).send({
+                        embeds: [
+                            new Discord.EmbedBuilder()
+                                .setColor(3447003)
+                                .setDescription(`Invalid request: ${request.command} ${request.taskName}`)
+                        ]
+                    });
+                }
                 break;
         }
     }
 
     private displayBoard(message: Discord.Message, caller: string) {
-        message.channel.send(new Discord.RichEmbed({
-            color: 3447003,
-            description: `${this.botName}!`
-        })
-        .addField('Project Backlog ', `\`\`\`${this.displayColumn(this.board.backlog.getTasks())}\`\`\``)
-        .addField('In Progress ', `\`\`\`${this.displayColumn(this.board.inProgress.getTasks())}\`\`\``)
-        .addField('Completed Tasks', `\`\`\`${this.displayColumn(this.board.complete.getTasks())}\`\`\``)
-        .addField("I've been called by ", caller));
+        if (
+            message.channel &&
+            (message.channel.type === Discord.ChannelType.GuildText ||
+             message.channel.type === Discord.ChannelType.GuildAnnouncement ||
+             message.channel.type === Discord.ChannelType.PublicThread ||
+             message.channel.type === Discord.ChannelType.PrivateThread ||
+             message.channel.type === Discord.ChannelType.AnnouncementThread)
+        ) {
+            (message.channel as Discord.TextChannel | Discord.NewsChannel | Discord.ThreadChannel).send({
+                embeds: [
+                    new Discord.EmbedBuilder()
+                        .setColor(3447003)
+                        .setDescription(`${this.botName}!`)
+                        .addFields(
+                            { name: 'Project Backlog ', value: `\`\`\`${this.displayColumn(this.board.backlog.getTasks())}\`\`\`` },
+                            { name: 'In Progress ', value: `\`\`\`${this.displayColumn(this.board.inProgress.getTasks())}\`\`\`` },
+                            { name: 'Completed Tasks', value: `\`\`\`${this.displayColumn(this.board.complete.getTasks())}\`\`\`` },
+                            { name: "I've been called by ", value: caller }
+                        )
+                ]
+            });
+        }
     }
 
     private displayColumn(from: Task[]) {
@@ -117,35 +153,55 @@ export class KanbotClient {
     private addToBacklog(message: Discord.Message, taskName: string) {
         const author: string = message.author.username;
         if (this.board.containsTask(taskName)) {
-            message.channel.send({
-                embed: {
-                    color: 3447003,
-                    description: `Not adding task ${taskName} because it already exists in the kanban board.`
-                }
-            });
+            if (
+                message.channel &&
+                (message.channel.type === Discord.ChannelType.GuildText ||
+                 message.channel.type === Discord.ChannelType.GuildAnnouncement ||
+                 message.channel.type === Discord.ChannelType.PublicThread ||
+                 message.channel.type === Discord.ChannelType.PrivateThread ||
+                 message.channel.type === Discord.ChannelType.AnnouncementThread)
+            ) {
+                (message.channel as Discord.TextChannel | Discord.NewsChannel | Discord.ThreadChannel).send({
+                    embeds: [
+                        new Discord.EmbedBuilder()
+                            .setColor(3447003)
+                            .setDescription(`Not adding task ${taskName} because it already exists in the kanban board.`)
+                    ]
+                });
+            }
             return;
         }
 
-        message.channel.send({
-            embed: {
-                color: 3447003,
-                description: `${taskName} has been added to the Backlog by ${author}`
-            }
-        });
+        if (
+            message.channel &&
+            (message.channel.type === Discord.ChannelType.GuildText ||
+             message.channel.type === Discord.ChannelType.GuildAnnouncement ||
+             message.channel.type === Discord.ChannelType.PublicThread ||
+             message.channel.type === Discord.ChannelType.PrivateThread ||
+             message.channel.type === Discord.ChannelType.AnnouncementThread)
+        ) {
+            (message.channel as Discord.TextChannel | Discord.NewsChannel | Discord.ThreadChannel).send({
+                embeds: [
+                    new Discord.EmbedBuilder()
+                        .setColor(3447003)
+                        .setDescription(`${taskName} has been added to the Backlog by ${author}`)
+                ]
+            });
+        }
         this.board.addToBacklog(new Task(taskName, author));
     }
-
-    private helpList(message: Discord.Message) {
-        const Help = new Discord.RichEmbed()
+    private helpList(message: Discord.Message): Discord.EmbedBuilder {
+        const Help = new Discord.EmbedBuilder()
             .setColor('#0074E7')
             .setTitle('List of Board Commands')
-            .addField(`${help.view.command}`, `${help.view.desc}`)
-            .addField(`${help.add.command}`, `${help.add.desc}`)
-            .addField(`${help.remove.command}`, `${help.remove.desc}`)
-            .addField(`${help.clearTask.command}`, `${help.clearTask.desc}`)
-            .addField(`${help.startTask.command}`, `${help.startTask.desc}`)
-            .addField(`${help.completeTask.command}`, `${help.completeTask.desc}`);
-        console.log(message);
+            .addFields(
+                { name: `${help.view.command}`, value: `${help.view.desc}` },
+                { name: `${help.add.command}`, value: `${help.add.desc}` },
+                { name: `${help.remove.command}`, value: `${help.remove.desc}` },
+                { name: `${help.clearTask.command}`, value: `${help.clearTask.desc}` },
+                { name: `${help.startTask.command}`, value: `${help.startTask.desc}` },
+                { name: `${help.completeTask.command}`, value: `${help.completeTask.desc}` }
+            );
         return Help;
     }
 
@@ -153,19 +209,21 @@ export class KanbotClient {
         try {
             const match: Task = await this.board.findMatch(item);
             this.board.remove(match);
-            return message.channel.send({
-                embed: {
-                    color: 3447003,
-                    description: `Removed ${item} by ${message.author.username}`
-                }
+            return (message.channel as Discord.TextChannel | Discord.NewsChannel | Discord.ThreadChannel).send({
+                embeds: [
+                    new Discord.EmbedBuilder()
+                        .setColor(3447003)
+                        .setDescription(`Removed ${item} by ${message.author.username}`)
+                ]
             });
         } catch (error) {
             console.log(error);
-            return message.channel.send({
-                embed: {
-                    color: 3447003,
-                    description: 'No matching item found, nothing removed.'
-                }
+            return (message.channel as Discord.TextChannel | Discord.NewsChannel | Discord.ThreadChannel).send({
+                embeds: [
+                    new Discord.EmbedBuilder()
+                        .setColor(3447003)
+                        .setDescription('No matching item found, nothing removed.')
+                ]
             });
         }
     }
@@ -184,11 +242,12 @@ export class KanbotClient {
         if (task instanceof Task) {
             from.remove(task);
             to.add(task);
-            message.channel.send({
-                embed: {
-                    color: 3447003,
-                    description: `${item} moved from "${from.getName()}" to "${to.getName()}" by: ${message.author.username}`
-                }
+            (message.channel as Discord.TextChannel | Discord.NewsChannel | Discord.ThreadChannel).send({
+                embeds: [
+                    new Discord.EmbedBuilder()
+                        .setColor(3447003)
+                        .setDescription(`${item} moved from "${from.getName()}" to "${to.getName()}" by: ${message.author.username}`)
+                ]
             });
         }
     }
