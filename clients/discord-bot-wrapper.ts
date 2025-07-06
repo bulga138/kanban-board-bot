@@ -9,7 +9,7 @@ interface DiscordBot {
 
 export class KanbanBot implements DiscordBot {
     
-    private kanbotClient: KanbotClient;
+    private readonly kanbotClient: KanbotClient;
 
     constructor(configuration: KanbotConfiguration, discordClient: Discord.Client) {
         this.kanbotClient = new KanbotClient(configuration, discordClient);

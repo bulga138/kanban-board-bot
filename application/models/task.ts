@@ -1,4 +1,4 @@
-import { isEqual, isMatch } from "lodash";
+import { isEqual } from "lodash";
 
 interface ITask {
     readonly name: string;

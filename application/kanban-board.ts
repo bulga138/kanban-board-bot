@@ -1,12 +1,12 @@
 import { Kanban } from './namespaces/kanban-board';
 import { Task } from "./models/task";
-import { isMatch, remove } from 'lodash';
+import { remove } from 'lodash';
 
 export class KanbanBoard {
 
-    constructor(private _backlog = new KanbanBoard.InnerColumn('Backlog'),
-        private _inProgress = new KanbanBoard.InnerColumn('In Progress'),
-		private _complete = new KanbanBoard.InnerColumn('Complete'),
+    constructor(private readonly _backlog = new KanbanBoard.InnerColumn('Backlog'),
+        private readonly _inProgress = new KanbanBoard.InnerColumn('In Progress'),
+		private readonly _complete = new KanbanBoard.InnerColumn('Complete'),
 		private currentTaskId: number = 0) { }
 
     /**
@@ -63,6 +63,7 @@ export class KanbanBoard {
             const columns: Kanban.Board.Column[] = [...(this.getColumns().values())];
             return columns.some(column => column.contains(task));
         } catch (error) {
+            console.error(`Error determining if task exists: ${error}`);
             // unable to determine task, so return false
             return false;
         }
@@ -75,12 +76,12 @@ export class KanbanBoard {
 			const task = Task.getTaskFromProperties(taskOrTaskName);
 			const match: Task | undefined = this.getAllTasks().find(item => item.matches(task));
 			
-			if (!!match) {
-				return Promise.resolve(match);
-			}
+            if (match) {
+                return Promise.resolve(match);
+            }
 			return Promise.reject(new Error('No match found'));
         } catch (error) {
-            return Promise.reject(error);
+            return Promise.reject(error instanceof Error ? error : new Error(String(error)));
         }
 	}
 
@@ -97,9 +98,9 @@ export class KanbanBoard {
         return 'None';
     }
 
-    static InnerColumn = class implements Kanban.Board.Column {
+    static readonly InnerColumn = class implements Kanban.Board.Column {
 
-        private _name: string;
+        private readonly _name: string;
         private _tasks: Task[];
 
         constructor(name: string, tasks: Task[] = []) {

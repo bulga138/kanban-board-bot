@@ -6,15 +6,17 @@ import { Task } from '../application/models/task';
 import { Kanban } from '../application/namespaces/kanban-board';
 import * as help from '../util/commands.json';
 
+type KanbotTextChannel = Discord.TextChannel | Discord.NewsChannel | Discord.ThreadChannel;
+
 export class KanbotClient {
 
-    private signal: string;
-    private botName: string;
-    private token: string;
+    private readonly signal: string;
+    private readonly botName: string;
+    private readonly token: string;
 
     constructor(kanbotConfiguration: KanbotConfiguration,
-        private discordClient: Discord.Client,
-        private board: KanbanBoard = new KanbanBoard()) {
+        private readonly discordClient: Discord.Client,
+        private readonly board: KanbanBoard = new KanbanBoard()) {
         
         this.signal = kanbotConfiguration.signal;
         this.botName = kanbotConfiguration.botName;
@@ -90,10 +92,8 @@ export class KanbotClient {
                 if (
                     channel.type === Discord.ChannelType.GuildText ||
                     channel.type === Discord.ChannelType.GuildAnnouncement ||
-                    channel.type === Discord.ChannelType.PublicThread ||
-                    channel.type === Discord.ChannelType.PrivateThread
-                ) {
-                    (channel as Discord.TextChannel | Discord.NewsChannel | Discord.ThreadChannel).send({
+                    channel.type === Discord.ChannelType.PublicThread) {
+                    (channel as KanbotTextChannel).send({
                         embeds: [
                             new Discord.EmbedBuilder()
                                 .setColor(3447003)
@@ -106,10 +106,8 @@ export class KanbotClient {
                 if (
                     channel.type === Discord.ChannelType.GuildText ||
                     channel.type === Discord.ChannelType.GuildAnnouncement ||
-                    channel.type === Discord.ChannelType.PublicThread ||
-                    channel.type === Discord.ChannelType.PrivateThread
-                ) {
-                    (channel as Discord.TextChannel | Discord.NewsChannel | Discord.ThreadChannel).send({
+                    channel.type === Discord.ChannelType.PublicThread) {
+                    (channel as KanbotTextChannel).send({
                         embeds: [
                             new Discord.EmbedBuilder()
                                 .setColor(3447003)
@@ -127,10 +125,8 @@ export class KanbotClient {
             (message.channel.type === Discord.ChannelType.GuildText ||
              message.channel.type === Discord.ChannelType.GuildAnnouncement ||
              message.channel.type === Discord.ChannelType.PublicThread ||
-             message.channel.type === Discord.ChannelType.PrivateThread ||
-             message.channel.type === Discord.ChannelType.AnnouncementThread)
-        ) {
-            (message.channel as Discord.TextChannel | Discord.NewsChannel | Discord.ThreadChannel).send({
+             message.channel.type === Discord.ChannelType.PrivateThread)) {
+            (message.channel as KanbotTextChannel).send({
                 embeds: [
                     new Discord.EmbedBuilder()
                         .setColor(3447003)
@@ -158,10 +154,8 @@ export class KanbotClient {
                 (message.channel.type === Discord.ChannelType.GuildText ||
                  message.channel.type === Discord.ChannelType.GuildAnnouncement ||
                  message.channel.type === Discord.ChannelType.PublicThread ||
-                 message.channel.type === Discord.ChannelType.PrivateThread ||
-                 message.channel.type === Discord.ChannelType.AnnouncementThread)
-            ) {
-                (message.channel as Discord.TextChannel | Discord.NewsChannel | Discord.ThreadChannel).send({
+                 message.channel.type === Discord.ChannelType.PrivateThread )) {
+                (message.channel as KanbotTextChannel).send({
                     embeds: [
                         new Discord.EmbedBuilder()
                             .setColor(3447003)
@@ -177,10 +171,8 @@ export class KanbotClient {
             (message.channel.type === Discord.ChannelType.GuildText ||
              message.channel.type === Discord.ChannelType.GuildAnnouncement ||
              message.channel.type === Discord.ChannelType.PublicThread ||
-             message.channel.type === Discord.ChannelType.PrivateThread ||
-             message.channel.type === Discord.ChannelType.AnnouncementThread)
-        ) {
-            (message.channel as Discord.TextChannel | Discord.NewsChannel | Discord.ThreadChannel).send({
+             message.channel.type === Discord.ChannelType.PrivateThread )) {
+            (message.channel as KanbotTextChannel).send({
                 embeds: [
                     new Discord.EmbedBuilder()
                         .setColor(3447003)
@@ -207,9 +199,7 @@ export class KanbotClient {
 
     private async removeItem(message: Discord.Message, item: string): Promise<Discord.Message | Discord.Message[]> {
         try {
-            const match: Task = await this.board.findMatch(item);
-            this.board.remove(match);
-            return (message.channel as Discord.TextChannel | Discord.NewsChannel | Discord.ThreadChannel).send({
+            return (message.channel as KanbotTextChannel).send({
                 embeds: [
                     new Discord.EmbedBuilder()
                         .setColor(3447003)
@@ -217,8 +207,8 @@ export class KanbotClient {
                 ]
             });
         } catch (error) {
-            console.log(error);
-            return (message.channel as Discord.TextChannel | Discord.NewsChannel | Discord.ThreadChannel).send({
+            console.error(`Error removing item: ${error}`);
+            return (message.channel as KanbotTextChannel).send({
                 embeds: [
                     new Discord.EmbedBuilder()
                         .setColor(3447003)
@@ -240,9 +230,7 @@ export class KanbotClient {
         const task: Task | undefined = from.findMatch({ name: item } as Task);
 
         if (task instanceof Task) {
-            from.remove(task);
-            to.add(task);
-            (message.channel as Discord.TextChannel | Discord.NewsChannel | Discord.ThreadChannel).send({
+            (message.channel as KanbotTextChannel).send({
                 embeds: [
                     new Discord.EmbedBuilder()
                         .setColor(3447003)

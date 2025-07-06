@@ -3,7 +3,7 @@ import { Status, Task } from "./task";
 export class DatedTask extends Task {
 
     readonly _createdDate: Date;
-    private _addToColumnDate: Date;
+    private readonly _addToColumnDate: Date;
 
     constructor(name: string,
         creator?: string,

@@ -7,10 +7,10 @@ import { Task } from "./application/models/task";
 import { KanbotClient } from "./clients/kanbot-client";
 
 const configuration: KanbotConfiguration = new KanbotConfiguration(
-  botconfig.botName,
   botconfig.token,
+  botconfig.botName,
   botconfig.prefix,
-  "kanbot"
+  "fart"
 );
 const clientOptions: ClientOptions = {
   intents: [
